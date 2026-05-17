@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import LineWaves from "@/components/react-bits/LineWaves";
+import ColorBends from "@/components/react-bits/ColorBends";
 
 export default function HomeBackground({ trailImages }: { trailImages?: string[] }) {
   useEffect(() => {
@@ -95,22 +95,23 @@ export default function HomeBackground({ trailImages }: { trailImages?: string[]
 
   return (
     <div className="home-global-bg" style={{ overflow: 'hidden' }}>
-      {/* Premium LineWaves Background Canvas */}
+      {/* Premium ColorBends Background Canvas */}
       <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, opacity: 0.6, pointerEvents: 'none' }}>
-        <LineWaves
-          speed={0.3}
-          innerLineCount={32}
-          outerLineCount={36}
-          warpIntensity={1}
-          rotation={-45}
-          edgeFadeWidth={0}
-          colorCycleSpeed={1}
-          brightness={0.2}
-          color1="#ffffff"
-          color2="#ffffff"
-          color3="#ffffff"
-          enableMouseInteraction
-          mouseInfluence={2}
+        <ColorBends
+          colors={["#ff5c7a", "#8a5cff", "#00ffd1"]}
+          rotation={90}
+          speed={0.2}
+          scale={1}
+          frequency={1}
+          warpStrength={1}
+          mouseInfluence={1}
+          noise={0.15}
+          parallax={0.5}
+          iterations={1}
+          intensity={1.5}
+          bandWidth={6}
+          transparent
+          autoRotate={0}
         />
       </div>
 
