@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef } from "react";
-import { formatDuration } from "@/lib/utils/formatters";
-import ArtistCard from "@/components/ui/ArtistCard";
+import MagicBento from "@/components/react-bits/MagicBento";
 
 export default function FeaturedArtists({ artists, favorites = [] }: { artists: any[], favorites?: string[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -36,15 +35,21 @@ export default function FeaturedArtists({ artists, favorites = [] }: { artists: 
           <Link href="/artists" className="btn-outline">All Artists →</Link>
         </div>
 
-        <div className="artists-grid">
-          {artists.map((artist, index) => (
-            <ArtistCard 
-              key={artist.slug} 
-              artist={artist} 
-              index={index} 
-              initialIsFavorite={favorites.includes(artist._id.toString())}
-            />
-          ))}
+        <div className="reveal" style={{ marginTop: '2.5rem' }}>
+          <MagicBento 
+            artists={artists}
+            textAutoHide={false}
+            enableStars={true}
+            enableSpotlight={true}
+            enableBorderGlow={true}
+            enableTilt={true}
+            enableMagnetism={false}
+            clickEffect={false}
+            spotlightRadius={100}
+            particleCount={5}
+            glowColor="132, 0, 255"
+            disableAnimations={false}
+          />
         </div>
       </div>
     </section>

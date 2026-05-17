@@ -102,8 +102,8 @@ export async function deleteArtist(id: string) {
 export async function getRandomArtists(limit: number = 10) {
   await connectToDatabase();
   const artists = await Artist.aggregate([
-    { $sample: { size: limit } },
-    { $project: { "media.images": 1 } }
+    { $match: { "media.images": { $exists: true, $not: { $size: 0 } } } },
+    { $sample: { size: limit } }
   ]);
   return JSON.parse(JSON.stringify(artists));
 }

@@ -13,22 +13,20 @@ import HomeBackground from "@/components/home/HomeBackground";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [featuredRes, categories, counts, session, randomArtists] = await Promise.all([
-    getArtists({ limit: 4, featured: true }), 
+  const [randomArtists, categories, counts, session] = await Promise.all([
+    getRandomArtists(20),
     getDistinctCategories(),
     getCategoryCounts(),
-    getServerSession(authOptions),
-    getRandomArtists(15)
+    getServerSession(authOptions)
   ]);
   
   const favorites = session?.user ? await getUserFavorites((session.user as any).id) : [];
 
-  // Fallback if no featured artists found
-  let displayArtists = (featuredRes as any).artists;
-  if (displayArtists.length === 0) {
-    const fallbackRes = await getArtists({ limit: 4 }) as any;
-    displayArtists = fallbackRes.artists;
-  }
+  // Shuffle categories & featured artists to cause data rotation on every single refresh!
+  const shuffledCategories = (categories as string[]).sort(() => 0.5 - Math.random());
+  
+  // Slice 6 random artists with images for the bento grid display!
+  const displayArtists = randomArtists.slice(0, 6);
   
   const trailImages = randomArtists
     .map((a: any) => a.media?.images?.[0])
@@ -37,8 +35,8 @@ export default async function HomePage() {
   return (
     <div className="relative overflow-hidden">
       <HomeBackground trailImages={trailImages} />
-      <HeroSection categories={categories as string[]} trailImages={trailImages} />
-      
+      <HeroSection categories={shuffledCategories} artists={randomArtists} />
+
       {/* Infinite Scrolling Premium Gold Marquee Row */}
       <div className="marquee-wrap">
         <div className="marquee-track">
@@ -58,7 +56,8 @@ export default async function HomePage() {
         </div>
       </div>
 
-      <CategoryGrid counts={counts} categories={categories as string[]} />
+      <CategoryGrid counts={counts} categories={shuffledCategories} />
+
       <FeaturedArtists artists={displayArtists} favorites={favorites} />
 
       {/* How it Works */}

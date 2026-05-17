@@ -34,7 +34,7 @@ html {
   --tr: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   /* Central Typography Variables - Swap these anytime to easily customize the entire website's fonts! */
-  --font-primary: var(--font-mono), monospace;
+  --font-primary: var(--font-outfit), sans-serif;
   --font-display: var(--font-limelight), var(--font-playfair), "Playfair Display", serif;
 }
 
@@ -56,9 +56,9 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-primary);
-  font-size: 0.82rem;
+  font-size: 0.88rem;
   line-height: 1.6;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.01em;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }

@@ -21,13 +21,8 @@ interface Event {
   status: string;
 }
 
-export default function HeroSection({ categories }: { categories: string[] }) {
+export default function HeroSection({ categories, artists: initialArtists }: { categories: string[], artists?: Artist[] }) {
   const router = useRouter();
-
-  // states for dynamic widgets
-  const [artists, setArtists] = useState<Artist[]>([]);
-  const [events, setEvents] = useState<Event[]>([]);
-  const [currentArtistIndex, setCurrentArtistIndex] = useState(0);
 
   // fallback premium mock data to ensure layout always looks gorgeous
   const fallbackArtists: Artist[] = [
@@ -89,6 +84,11 @@ export default function HeroSection({ categories }: { categories: string[] }) {
     }
   ];
 
+  // states for dynamic widgets
+  const [artists, setArtists] = useState<Artist[]>(initialArtists && initialArtists.length > 0 ? initialArtists : fallbackArtists);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [currentArtistIndex, setCurrentArtistIndex] = useState(0);
+
   const categoriesGrid = [
     {
       name: "Singers",
@@ -116,40 +116,18 @@ export default function HeroSection({ categories }: { categories: string[] }) {
     }
   ];
 
-  // fetch data on mount
+  // fetch events on mount
   useEffect(() => {
     async function fetchData() {
       try {
-        const [artistsRes, eventsRes] = await Promise.all([
-          fetch("/api/artists?featured=true&limit=6").then(r => r.json()),
-          fetch("/api/events?limit=3").then(r => r.json())
-        ]);
-
-        let fetchedArtists = [];
-        if (artistsRes?.success && artistsRes?.data?.artists?.length > 0) {
-          fetchedArtists = artistsRes.data.artists;
-        } else {
-          // Fallback: Fetch any real database artists if featured is empty
-          const dbArtistsRes = await fetch("/api/artists?limit=8").then(r => r.json());
-          if (dbArtistsRes?.success && dbArtistsRes?.data?.artists?.length > 0) {
-            fetchedArtists = dbArtistsRes.data.artists;
-          }
-        }
-
-        if (fetchedArtists.length > 0) {
-          setArtists(fetchedArtists);
-        } else {
-          setArtists(fallbackArtists);
-        }
-
+        const eventsRes = await fetch("/api/events?limit=3").then(r => r.json());
         if (eventsRes && !eventsRes.error && eventsRes.events?.length > 0) {
           setEvents(eventsRes.events);
         } else {
           setEvents(fallbackEvents);
         }
       } catch (err) {
-        console.error("Failed to load hero panel data:", err);
-        setArtists(fallbackArtists);
+        console.error("Failed to load hero events data:", err);
         setEvents(fallbackEvents);
       }
     }
