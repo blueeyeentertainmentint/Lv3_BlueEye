@@ -200,15 +200,15 @@ footer {
   }
 }
 .footer-brand p {
-  color: var(--text3);
-  font-size: .875rem;
+  color: var(--text2);
+  font-size: .78rem;
   line-height: 1.7;
   margin: 1rem 0 1.25rem;
   max-width: 280px;
 }
 [data-theme="light"] .footer-brand p,
 [data-theme="light"] .footer-col a {
-  color: var(--text3);
+  color: var(--text2);
 }
 .social-links {
   display: flex;
@@ -222,7 +222,7 @@ footer {
   border-radius: 9px;
   display: grid;
   place-items: center;
-  color: var(--text3);
+  color: var(--text2);
   font-size: .8rem;
   text-decoration: none;
   transition: all var(--tr);
@@ -233,10 +233,12 @@ footer {
   background: rgba(0, 210, 255, .08);
 }
 .footer-col h4 {
-  font-size: .9rem;
-  font-weight: 700;
+  font-size: .82rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
   margin-bottom: 1.25rem;
-  color: var(--text);
+  color: var(--gold);
 }
 .footer-col ul {
   list-style: none;
@@ -246,8 +248,8 @@ footer {
 }
 .footer-col a {
   text-decoration: none;
-  color: var(--text3);
-  font-size: .875rem;
+  color: var(--text2);
+  font-size: .78rem;
   transition: color var(--tr);
   display: flex;
   align-items: center;
@@ -275,7 +277,7 @@ footer {
   flex-wrap: wrap;
 }
 .footer-bottom p {
-  font-size: .8rem;
+  font-size: .75rem;
   color: var(--text3);
 }
 .footer-bottom-links {
@@ -283,7 +285,7 @@ footer {
   gap: 1.25rem;
 }
 .footer-bottom-links a {
-  font-size: .8rem;
+  font-size: .75rem;
   color: var(--text3);
   text-decoration: none;
   transition: color var(--tr);

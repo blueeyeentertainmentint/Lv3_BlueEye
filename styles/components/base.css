@@ -56,7 +56,8 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-primary);
-  line-height: 1.5;
+  font-size: 0.82rem;
+  line-height: 1.6;
   letter-spacing: 0.05em;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;

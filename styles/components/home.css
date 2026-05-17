@@ -143,9 +143,9 @@
 }
 
 .hero-sub {
-  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  font-size: clamp(0.85rem, 1.8vw, 0.95rem);
   color: var(--text2);
-  font-weight: 400;
+  font-weight: 700;
   line-height: 1.7;
   max-width: 580px;
   margin: 0 auto 2rem;
@@ -354,6 +354,8 @@ section {
 
 .section-desc {
   color: var(--text2);
+  font-size: 0.8rem;
+  font-weight: 700;
   line-height: 1.7;
   max-width: 500px;
 }
@@ -855,11 +857,12 @@ section {
 }
 
 .testimonial-text {
-  font-size: 0.92rem;
+  font-size: 0.8rem;
   line-height: 1.75;
   color: var(--text2);
   margin-bottom: 1.25rem;
   font-style: italic;
+  font-weight: 700;
 }
 
 .testimonial-author {
@@ -887,8 +890,9 @@ section {
 }
 
 .author-role {
-  font-size: 0.76rem;
-  color: var(--text3);
+  font-size: 0.72rem;
+  color: var(--text2);
+  font-weight: 700;
 }
 
 /* ── CTA BANNER ───────────────────────────────────── */
