@@ -10,12 +10,17 @@ export default async function NewEventPage() {
   if (!session || (session.user as any).role !== "admin") redirect("/login");
 
   return (
-    <div style={{ maxWidth: 720 }}>
-      <div style={{ marginBottom: "2rem" }}>
-        <div className="section-label">Admin › Events</div>
-        <h1 className="section-title" style={{ fontSize: "1.75rem", margin: 0 }}>Create New Event</h1>
+    <div className="fade-in" style={{ maxWidth: "800px" }}>
+      <div className="mb-10">
+        <h1 className="admin-title">
+          Create <span className="text-gold">New Event</span>
+        </h1>
+        <p className="admin-subtitle">Add a new event with timeline updates and guest registrations.</p>
       </div>
-      <EventForm mode="create" />
+
+      <div className="admin-table-container" style={{ padding: "2rem", marginTop: "1rem" }}>
+        <EventForm mode="create" />
+      </div>
     </div>
   );
 }

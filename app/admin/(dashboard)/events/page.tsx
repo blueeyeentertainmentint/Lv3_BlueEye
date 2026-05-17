@@ -1,97 +1,132 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth/authOptions";
-import { redirect } from "next/navigation";
-import { getEvents, getEventStats } from "@/lib/services/eventService";
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
-export const dynamic = "force-dynamic";
-
-const statusColors: Record<string, string> = {
-  Upcoming: "#d4a017", Ongoing: "#22c55e", Completed: "#6b7280", Cancelled: "#ef4444",
+const STATUS_COLORS: Record<string, string> = {
+  Upcoming: "gold", Ongoing: "emerald", Completed: "muted", Cancelled: "crimson",
 };
 
-export default async function AdminEventsPage() {
-  const session = await getServerSession(authOptions);
-  if (!session || (session.user as any).role !== "admin") redirect("/login");
+export default function AdminEventsPage() {
+  const [events, setEvents] = useState<any[]>([]);
+  const [stats, setStats] = useState<Record<string, number>>({});
+  const [loading, setLoading] = useState(true);
 
-  const [result, stats] = await Promise.all([
-    getEvents({ limit: 50 }) as any,
-    getEventStats(),
-  ]);
+  useEffect(() => {
+    fetch("/api/admin/events?limit=50")
+      .then(r => r.json())
+      .then(d => {
+        setEvents(d.events || []);
+        setStats(d.stats || {});
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
-  const events = result.events;
+  async function handleDelete(id: string, title: string) {
+    if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
+    await fetch(`/api/admin/events/${id}`, { method: "DELETE" });
+    setEvents(prev => prev.filter(e => e._id !== id));
+  }
 
   return (
-    <div>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "2rem", flexWrap: "wrap", gap: "1rem" }}>
+    <div className="fade-in">
+      {/* Header */}
+      <div className="flex justify-between items-end mb-10 gap-8">
         <div>
-          <div className="section-label">Admin</div>
-          <h1 className="section-title" style={{ fontSize: "1.75rem", margin: 0 }}>Events</h1>
+          <h1 className="admin-title">
+            Event <span className="text-gold">Management</span>
+          </h1>
+          <p className="admin-subtitle">
+            Create and manage events, post timeline updates, and handle registrations.
+          </p>
         </div>
-        <Link href="/admin/events/new" className="btn-primary">+ New Event</Link>
+        <Link href="/admin/events/new" className="btn-primary py-3 px-6 rounded-xl">
+          + Create Event
+        </Link>
       </div>
 
-      {/* Stats */}
-      <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", marginBottom: "2rem" }}>
-        {Object.entries(stats).map(([s, count]) => (
-          <div key={s} style={{
-            padding: "0.75rem 1.25rem", borderRadius: "0.6rem",
-            background: `${statusColors[s] || "#d4a017"}12`,
-            border: `1px solid ${statusColors[s] || "#d4a017"}33`,
-            fontSize: "0.82rem", color: "var(--text)",
-          }}>
-            <strong style={{ color: statusColors[s] || "#d4a017" }}>{s}</strong>: {count as number}
-          </div>
-        ))}
-      </div>
+      {/* Stats row */}
+      {Object.keys(stats).length > 0 && (
+        <div className="flex gap-4 flex-wrap mb-8">
+          {Object.entries(stats).map(([status, count]) => (
+            <div key={status} className="admin-table-container py-4 px-6 flex flex-col gap-1" style={{ minWidth: 120 }}>
+              <span className="text-xs text-text3 uppercase tracking-widest">{status}</span>
+              <span className="text-2xl font-bold text-gold">{count as number}</span>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Table */}
-      {events.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "4rem", color: "var(--muted,#9ca3af)",
-          border: "1px dashed rgba(255,255,255,0.1)", borderRadius: "1rem" }}>
-          No events yet. <Link href="/admin/events/new" style={{ color: "var(--gold,#d4a017)" }}>Create one →</Link>
-        </div>
-      ) : (
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <div className="admin-table-container">
+        <div className="overflow-x-auto">
+          <table className="admin-table">
             <thead>
               <tr>
-                {["Title", "Category", "Date", "Venue", "Status", "Actions"].map(h => (
-                  <th key={h} style={{ padding: "0.6rem 0.85rem", textAlign: "left", fontSize: "0.72rem",
-                    fontWeight: 700, color: "var(--muted,#9ca3af)", letterSpacing: "0.06em",
-                    textTransform: "uppercase", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-                    {h}
-                  </th>
-                ))}
+                <th>Event</th>
+                <th>Category</th>
+                <th>Date</th>
+                <th>Venue</th>
+                <th>Status</th>
+                <th>Reg.</th>
+                <th className="text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {events.map((ev: any) => (
+              {loading ? (
+                <tr><td colSpan={7} className="text-center py-16">Loading events…</td></tr>
+              ) : events.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="text-center py-16">
+                    No events yet.{" "}
+                    <Link href="/admin/events/new" className="text-gold underline">Create one →</Link>
+                  </td>
+                </tr>
+              ) : events.map((ev) => (
                 <tr key={ev._id}>
-                  <td style={{ padding: "0.75rem 0.85rem", borderBottom: "1px solid rgba(255,255,255,0.05)", fontWeight: 600, color: "var(--text)" }}>
-                    {ev.featured && <span title="Featured" style={{ color: "var(--gold,#d4a017)", marginRight: "0.3rem" }}>✦</span>}
-                    {ev.title}
+                  <td>
+                    <div className="flex items-center gap-3">
+                      {ev.coverImage ? (
+                        <img src={ev.coverImage} alt="" style={{ width: 44, height: 44, borderRadius: 8, objectFit: "cover", flexShrink: 0 }} />
+                      ) : (
+                        <div style={{ width: 44, height: 44, borderRadius: 8, background: "rgba(212,160,23,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                        </div>
+                      )}
+                      <div>
+                        <div className="font-bold">
+                          {ev.featured && <span className="text-gold mr-1">✦</span>}
+                          {ev.title}
+                        </div>
+                        <div className="text-xs text-text3">{ev.registrationOpen ? "Registration open" : "Registration closed"}</div>
+                      </div>
+                    </div>
                   </td>
-                  <td style={{ padding: "0.75rem 0.85rem", borderBottom: "1px solid rgba(255,255,255,0.05)", fontSize: "0.82rem", color: "var(--muted,#9ca3af)" }}>
-                    {ev.category}
-                  </td>
-                  <td style={{ padding: "0.75rem 0.85rem", borderBottom: "1px solid rgba(255,255,255,0.05)", fontSize: "0.82rem", color: "var(--muted,#9ca3af)", whiteSpace: "nowrap" }}>
+                  <td><span className="admin-badge">{ev.category}</span></td>
+                  <td className="text-sm">
                     {new Date(ev.startDate).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
                   </td>
-                  <td style={{ padding: "0.75rem 0.85rem", borderBottom: "1px solid rgba(255,255,255,0.05)", fontSize: "0.82rem", color: "var(--muted,#9ca3af)" }}>
-                    {ev.venue?.city || "—"}
+                  <td className="text-sm text-text2">{ev.venue?.city || "—"}</td>
+                  <td>
+                    <span className={`admin-badge ${ev.status === "Ongoing" ? "bg-emerald/10 text-emerald border-emerald/20" : ev.status === "Cancelled" ? "bg-crimson/10 text-crimson border-crimson/20" : ev.status === "Completed" ? "opacity-50" : ""}`}>
+                      {ev.status === "Ongoing" && <span style={{ display: "inline-block", width: 7, height: 7, borderRadius: "50%", background: "#22c55e", marginRight: 5, animation: "pulse 1.5s infinite" }} />}
+                      {ev.status}
+                    </span>
                   </td>
-                  <td style={{ padding: "0.75rem 0.85rem", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                    <span style={{
-                      padding: "3px 10px", borderRadius: "999px", fontSize: "0.75rem", fontWeight: 600,
-                      color: statusColors[ev.status] || "#d4a017",
-                      background: `${statusColors[ev.status] || "#d4a017"}18`,
-                    }}>{ev.status}</span>
+                  <td className="text-sm text-center">
+                    {ev.capacity > 0 ? `/ ${ev.capacity}` : "∞"}
                   </td>
-                  <td style={{ padding: "0.75rem 0.85rem", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                    <div style={{ display: "flex", gap: "0.5rem" }}>
-                      <Link href={`/admin/events/${ev._id}`} style={{ fontSize: "0.78rem", color: "var(--gold,#d4a017)", textDecoration: "none" }}>Manage</Link>
-                      <Link href={`/events/${ev.slug}`} target="_blank" style={{ fontSize: "0.78rem", color: "var(--muted,#9ca3af)", textDecoration: "none" }}>View ↗</Link>
+                  <td className="text-right">
+                    <div className="flex gap-2 justify-end">
+                      <Link href={`/admin/events/${ev._id}`} className="admin-action-btn" title="Manage">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                      </Link>
+                      <Link href={`/events/${ev.slug}`} target="_blank" className="admin-action-btn" title="View public">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                      </Link>
+                      <button onClick={() => handleDelete(ev._id, ev.title)} className="admin-action-btn delete" title="Delete">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -99,7 +134,7 @@ export default async function AdminEventsPage() {
             </tbody>
           </table>
         </div>
-      )}
+      </div>
     </div>
   );
 }

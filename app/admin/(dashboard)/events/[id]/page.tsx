@@ -1,17 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useEffect, useState, use } from "react";
 import EventForm from "@/components/admin/EventForm";
 import EventUpdateForm from "@/components/admin/EventUpdateForm";
-import EventTimeline from "@/components/events/EventTimeline";
 import RegistrationTable from "@/components/admin/RegistrationTable";
 import Link from "next/link";
 
 type Tab = "details" | "thread" | "registrations";
 
-export default function AdminEventDetailPage() {
-  const { id } = useParams<{ id: string }>();
+export default function AdminEventDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const [tab, setTab] = useState<Tab>("details");
   const [event, setEvent] = useState<any>(null);
   const [updates, setUpdates] = useState<any[]>([]);
@@ -21,124 +19,127 @@ export default function AdminEventDetailPage() {
   useEffect(() => {
     async function load() {
       setLoading(true);
-      const [evRes, updRes, regRes] = await Promise.all([
-        fetch(`/api/admin/events/${id}`),
-        fetch(`/api/admin/events/${id}/updates`),
-        fetch(`/api/admin/events/${id}/registrations`),
-      ]);
-      if (evRes.ok) setEvent(await evRes.json());
-      if (updRes.ok) setUpdates(await updRes.json());
-      if (regRes.ok) setRegistrations(await regRes.json());
-      setLoading(false);
+      try {
+        const [evRes, updRes, regRes] = await Promise.all([
+          fetch(`/api/admin/events/${id}`),
+          fetch(`/api/admin/events/${id}/updates`),
+          fetch(`/api/admin/events/${id}/registrations`),
+        ]);
+        if (evRes.ok) setEvent(await evRes.json());
+        if (updRes.ok) setUpdates(await updRes.json());
+        if (regRes.ok) setRegistrations(await regRes.json());
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
     }
     load();
   }, [id]);
 
   async function deleteUpdate(uid: string) {
-    if (!confirm("Delete this update?")) return;
+    if (!confirm("Are you sure you want to delete this update? This action cannot be undone.")) return;
     await fetch(`/api/admin/events/${id}/updates/${uid}`, { method: "DELETE" });
     setUpdates(prev => prev.filter(u => u._id !== uid));
   }
 
   const tabs: { key: Tab; label: string }[] = [
-    { key: "details",       label: "Details" },
-    { key: "thread",        label: `Thread (${updates.length})` },
-    { key: "registrations", label: `Registrations (${registrations.length})` },
+    { key: "details",       label: "Event Details" },
+    { key: "thread",        label: `Live Updates Thread (${updates.length})` },
+    { key: "registrations", label: `Guest Registrations (${registrations.length})` },
   ];
 
   const tabBtn = (key: Tab, label: string) => (
-    <button key={key} onClick={() => setTab(key)}
-      style={{
-        padding: "8px 18px", border: "none", cursor: "pointer",
-        borderBottom: tab === key ? "2px solid var(--gold,#d4a017)" : "2px solid transparent",
-        background: "transparent", fontWeight: tab === key ? 700 : 400,
-        color: tab === key ? "var(--gold,#d4a017)" : "var(--muted,#9ca3af)",
-        fontSize: "0.875rem", transition: "all 0.15s",
-      }}>
+    <button
+      key={key}
+      onClick={() => setTab(key)}
+      className={`py-3 px-6 text-sm font-semibold transition-all border-b-2 outline-none ${
+        tab === key
+          ? "border-gold text-gold font-bold"
+          : "border-transparent text-text3 hover:text-white"
+      }`}
+      style={{ background: "transparent" }}
+    >
       {label}
     </button>
   );
 
-  if (loading) return <div style={{ padding: "3rem", color: "var(--muted,#9ca3af)" }}>Loading…</div>;
-  if (!event) return <div style={{ padding: "3rem", color: "#f87171" }}>Event not found.</div>;
+  if (loading) return <div className="p-16 text-center text-text3">Loading event details...</div>;
+  if (!event) return <div className="p-16 text-center text-crimson">Event not found.</div>;
 
   return (
-    <div>
-      {/* Header */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "1.5rem", gap: "1rem", flexWrap: "wrap" }}>
-        <div>
-          <div style={{ fontSize: "0.78rem", color: "var(--muted,#9ca3af)", marginBottom: "0.25rem" }}>
-            <Link href="/admin/events" style={{ color: "var(--gold,#d4a017)", textDecoration: "none" }}>Events</Link> /
-          </div>
-          <h1 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 800, color: "var(--text)" }}>{event.title}</h1>
-        </div>
-        <Link href={`/events/${event.slug}`} target="_blank"
-          className="btn-outline" style={{ fontSize: "0.82rem" }}>
-          View Public Page ↗
+    <div className="fade-in">
+      {/* Back Link & Header */}
+      <div className="mb-8">
+        <Link href="/admin/events" className="text-text3 no-underline text-sm flex items-center gap-2 mb-4 hover:text-white transition-colors">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Back to Events List
         </Link>
+        
+        <div className="flex justify-between items-start gap-4 flex-wrap">
+          <div>
+            <h1 className="admin-title">
+              Manage <span className="text-gold">{event.title}</span>
+            </h1>
+            <p className="admin-subtitle">Configure options, manage the live event status updates, and oversee guest bookings.</p>
+          </div>
+          <Link href={`/events/${event.slug}`} target="_blank" className="btn-outline flex items-center gap-2 py-2 px-4 rounded-xl text-sm">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            View Live Page
+          </Link>
+        </div>
       </div>
 
-      {/* Tabs */}
-      <div style={{ display: "flex", borderBottom: "1px solid rgba(255,255,255,0.08)", marginBottom: "2rem" }}>
+      {/* Modern Tabs Navigation */}
+      <div className="flex border-b border-white/10 mb-8 overflow-x-auto">
         {tabs.map(t => tabBtn(t.key, t.label))}
       </div>
 
-      {/* Details tab */}
+      {/* Tab Contents */}
       {tab === "details" && (
-        <div style={{ maxWidth: 700 }}>
+        <div className="admin-table-container p-8" style={{ maxWidth: "800px" }}>
           <EventForm mode="edit" eventId={id} initial={event} />
         </div>
       )}
 
-      {/* Thread tab */}
       {tab === "thread" && (
-        <div>
+        <div style={{ maxWidth: "800px" }}>
           <EventUpdateForm eventId={id} onPosted={u => setUpdates(prev => [u, ...prev])} />
-          <div style={{ position: "relative" }}>
+          
+          <div className="flex flex-col gap-4 mt-6">
             {updates.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "2.5rem", color: "var(--muted,#9ca3af)",
-                border: "1px dashed rgba(255,255,255,0.1)", borderRadius: "0.75rem" }}>
-                No updates yet. Post the first one above.
+              <div className="text-center py-12 text-text3 border border-dashed border-white/10 rounded-xl">
+                No updates posted to the live thread yet. Use the form above to add one.
               </div>
             ) : (
-              updates.map((u, i) => (
-                <div key={u._id} style={{ position: "relative" }}>
-                  {/* connector line */}
-                  {i < updates.length - 1 && (
-                    <div style={{ position: "absolute", left: 17, top: 36, bottom: 0,
-                      width: 2, background: "rgba(255,255,255,0.07)" }} />
-                  )}
-                  <div style={{ display: "flex", gap: "1rem", marginBottom: "1.25rem", alignItems: "flex-start" }}>
-                    <div style={{ flex: 1 }}>
-                      {/* Reuse the public timeline post style */}
-                      <div style={{ padding: "1rem 1.25rem", background: "rgba(255,255,255,0.03)",
-                        border: "1px solid rgba(255,255,255,0.07)", borderRadius: "0.75rem" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.4rem", flexWrap: "wrap" }}>
-                          <span style={{ fontSize: "0.72rem", fontWeight: 700, padding: "2px 8px", borderRadius: "999px",
-                            background: "rgba(212,160,23,0.1)", color: "var(--gold,#d4a017)" }}>{u.type}</span>
-                          <span style={{ fontSize: "0.75rem", color: "var(--muted,#9ca3af)" }}>
-                            {new Date(u.createdAt).toLocaleString("en-IN")}
-                          </span>
-                          <button onClick={() => deleteUpdate(u._id)}
-                            style={{ marginLeft: "auto", background: "none", border: "none", cursor: "pointer",
-                              color: "#f87171", fontSize: "0.75rem", padding: "0 4px" }}>
-                            Delete
-                          </button>
-                        </div>
-                        <p style={{ margin: 0, fontSize: "0.88rem", lineHeight: 1.6, color: "var(--text)" }}>{u.content}</p>
+              updates.map((u) => {
+                const badgeColor = u.type === "Milestone" ? "text-gold bg-gold/10 border-gold/20" : u.type === "Alert" ? "text-crimson bg-crimson/10 border-crimson/20" : u.type === "Media" ? "text-purple-400 bg-purple-400/10 border-purple-400/20" : "text-blue-400 bg-blue-400/10 border-blue-400/20";
+                return (
+                  <div key={u._id} className="admin-table-container p-6 flex flex-col gap-3">
+                    <div className="flex justify-between items-center gap-4 flex-wrap">
+                      <div className="flex items-center gap-3">
+                        <span className={`admin-badge ${badgeColor}`}>{u.type}</span>
+                        <span className="text-xs text-text3">
+                          {new Date(u.createdAt).toLocaleString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                        </span>
                       </div>
+                      <button onClick={() => deleteUpdate(u._id)} className="text-xs text-crimson hover:underline bg-transparent border-none cursor-pointer">
+                        Delete Post
+                      </button>
                     </div>
+                    <p className="text-sm leading-relaxed text-text2 m-0">{u.content}</p>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </div>
       )}
 
-      {/* Registrations tab */}
       {tab === "registrations" && (
-        <RegistrationTable initialRegistrations={registrations} eventId={id} />
+        <div className="admin-table-container p-6">
+          <RegistrationTable initialRegistrations={registrations} eventId={id} />
+        </div>
       )}
     </div>
   );
