@@ -1633,3 +1633,63 @@ section {
     transform: translateY(0);
   }
 }
+
+/* ── GENRE DIVIDER MARQUEE ────────────────────────── */
+.genre-divider-marquee {
+  width: 100%;
+  overflow: hidden;
+  background: rgba(5, 7, 10, 0.45);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 0.85rem 0;
+  position: relative;
+  z-index: 10;
+  margin-top: 1.5rem;
+}
+
+.divider-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: dividerScroll 25s linear infinite;
+}
+
+.divider-marquee-group {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  padding-right: 3rem;
+}
+
+.marquee-node {
+  font-family: var(--font-outfit), sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  white-space: nowrap;
+}
+
+.gold-sparkle {
+  color: var(--gold);
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+  animation: pulseGold 2s ease-in-out infinite;
+}
+
+@keyframes dividerScroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes pulseGold {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}

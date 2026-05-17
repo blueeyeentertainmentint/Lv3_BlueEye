@@ -122,6 +122,24 @@ export default function HomeDynamicContent() {
       
       <HeroSection categories={shuffledCategories} artists={data?.randomArtists || []} />
       
+      {/* Premium Genre Icon Divider Marquee */}
+      <div className="genre-divider-marquee">
+        <div className="divider-marquee-track">
+          {[1, 2].map((loopIndex) => (
+            <div className="divider-marquee-group" key={loopIndex}>
+              <span className="marquee-node">🎤 SINGER <span className="gold-sparkle">✦</span></span>
+              <span className="marquee-node">🎭 COMEDIAN <span className="gold-sparkle">✦</span></span>
+              <span className="marquee-node">🎧 DJ <span className="gold-sparkle">✦</span></span>
+              <span className="marquee-node">🎸 INSTRUMENTALIST <span className="gold-sparkle">✦</span></span>
+              <span className="marquee-node">🕺 DANCER <span className="gold-sparkle">✦</span></span>
+              <span className="marquee-node">🧠 MENTALIST <span className="gold-sparkle">✦</span></span>
+              <span className="marquee-node">🎤 RAPPER <span className="gold-sparkle">✦</span></span>
+              <span className="marquee-node">🌟 CELEBRITY <span className="gold-sparkle">✦</span></span>
+            </div>
+          ))}
+        </div>
+      </div>
+      
       <CategoryGrid counts={data?.counts || {}} categories={shuffledCategories} />
       
       <FeaturedArtists artists={displayArtists} favorites={favorites} />
