@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import ColorBends from "@/components/react-bits/ColorBends";
+import DarkVeil from "@/components/react-bits/DarkVeil";
 
 export default function HomeBackground({ trailImages }: { trailImages?: string[] }) {
   useEffect(() => {
@@ -95,23 +95,15 @@ export default function HomeBackground({ trailImages }: { trailImages?: string[]
 
   return (
     <div className="home-global-bg" style={{ overflow: 'hidden' }}>
-      {/* Premium ColorBends Background Canvas */}
+      {/* Premium DarkVeil Background Canvas */}
       <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, opacity: 0.6, pointerEvents: 'none' }}>
-        <ColorBends
-          colors={["#ff5c7a", "#8a5cff", "#00ffd1"]}
-          rotation={90}
-          speed={0.2}
-          scale={1}
-          frequency={1}
-          warpStrength={1}
-          mouseInfluence={1}
-          noise={0.15}
-          parallax={0.5}
-          iterations={1}
-          intensity={1.5}
-          bandWidth={6}
-          transparent
-          autoRotate={0}
+        <DarkVeil
+          hueShift={0}
+          noiseIntensity={0}
+          scanlineIntensity={0}
+          speed={0.5}
+          scanlineFrequency={0}
+          warpAmount={0}
         />
       </div>
 
