@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import DarkVeil from "@/components/react-bits/DarkVeil";
+import LightRays from "@/components/react-bits/LightRays";
 
 export default function HomeBackground({ trailImages }: { trailImages?: string[] }) {
   useEffect(() => {
@@ -95,15 +95,22 @@ export default function HomeBackground({ trailImages }: { trailImages?: string[]
 
   return (
     <div className="home-global-bg" style={{ overflow: 'hidden' }}>
-      {/* Premium DarkVeil Background Canvas */}
+      {/* Premium LightRays Background Canvas */}
       <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, opacity: 0.6, pointerEvents: 'none' }}>
-        <DarkVeil
-          hueShift={0}
-          noiseIntensity={0}
-          scanlineIntensity={0}
-          speed={0.5}
-          scanlineFrequency={0}
-          warpAmount={0}
+        <LightRays
+          raysOrigin="top-center"
+          raysColor="#ffffff"
+          raysSpeed={1}
+          lightSpread={0.5}
+          rayLength={3}
+          followMouse={true}
+          mouseInfluence={0.1}
+          noiseAmount={0}
+          distortion={0}
+          className="custom-rays"
+          pulsating={false}
+          fadeDistance={1}
+          saturation={1}
         />
       </div>
 
