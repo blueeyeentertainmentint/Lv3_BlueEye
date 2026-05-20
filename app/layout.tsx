@@ -69,6 +69,7 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: "/icon.png",
+    shortcut: "/favicon.ico",
     apple: "/apple-touch-icon.png",
   },
   manifest: `/site.webmanifest`,
@@ -96,6 +97,22 @@ export default function RootLayout({
       data-theme="dark"
       className={`${playfair.variable} ${outfit.variable} ${limelight.variable} ${jetbrains.variable} h-full antialiased`}
     >
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: siteConfig.name,
+              url: siteConfig.url,
+              logo: `${siteConfig.url}/icon.png`,
+              description: siteConfig.description,
+              sameAs: Object.values(siteConfig.links).filter(Boolean)
+            })
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col">
         <GlobalEyeBackground />
         <LoadingProvider>

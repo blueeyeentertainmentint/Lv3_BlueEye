@@ -1,0 +1,37 @@
+{
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "blueeyeenertainment.vercel.app"
+        }
+      ],
+      "destination": "https://blueeyeentertainment.in/$1",
+      "permanent": true
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "blueeyeentertainment.vercel.app"
+        }
+      ],
+      "destination": "https://blueeyeentertainment.in/$1",
+      "permanent": true
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.blueeyeentertainment.in"
+        }
+      ],
+      "destination": "https://blueeyeentertainment.in/$1",
+      "permanent": true
+    }
+  ]
+}

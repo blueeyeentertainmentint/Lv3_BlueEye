@@ -7,7 +7,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return [];
   }
   
-  const baseUrl = siteConfig.url;
+  const baseUrl = siteConfig.url.replace(/\/$/, '');
   
   // Fetch artists for dynamic routes
   let artistUrls: any[] = [];
