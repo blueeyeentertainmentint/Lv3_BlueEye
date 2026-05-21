@@ -7,7 +7,7 @@ export function organizationJsonLd() {
     "@type": "Organization",
     name: siteConfig.name,
     url: siteConfig.url,
-    logo: `${siteConfig.url}/icon.png`,
+    logo: `${siteConfig.url}/favicon-96x96.png`,
     description: siteConfig.description,
     sameAs: Object.values(siteConfig.links).filter(Boolean),
   };
@@ -39,6 +39,7 @@ export function websiteJsonLd() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: siteConfig.name,
+    alternateName: [siteConfig.shortName, "Blue Eye Entertainment", "blueeyeentertainment.in"],
     url: siteConfig.url,
     description: siteConfig.description,
     publisher: { "@type": "Organization", name: siteConfig.name, url: siteConfig.url },
