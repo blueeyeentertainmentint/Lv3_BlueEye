@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
@@ -63,7 +64,15 @@ export default function Navbar() {
         <div className="hdr-inner">
           <Link href="/" className="logo" onClick={closeNav}>
             <div className="logo-icon">
-              <img src="/icon.png" alt="BlueEye Logo" style={{ width: '100%', height: '100%', borderRadius: 'inherit' }} />
+              <Image
+                src="/icon-96.webp"
+                alt="BlueEye Logo"
+                width={40}
+                height={40}
+                sizes="40px"
+                style={{ width: "100%", height: "100%", borderRadius: "inherit" }}
+                priority
+              />
             </div>
             <div className="logo-text">
               {siteConfig.name}

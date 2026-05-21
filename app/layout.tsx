@@ -7,8 +7,7 @@ import Footer from "@/components/layout/Footer";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 import AuthProvider from "@/components/auth/AuthProvider";
 
-import CustomCursor from "@/components/ui/CustomCursor";
-import GlobalEyeBackground from "@/components/ui/GlobalEyeBackground";
+import AppChrome from "@/components/layout/AppChrome";
 import { LoadingProvider } from "@/lib/context/LoadingContext";
 
 const playfair = Playfair_Display({
@@ -111,6 +110,7 @@ export default function RootLayout({
       className={`${playfair.variable} ${outfit.variable} ${limelight.variable} ${jetbrains.variable} h-full antialiased`}
     >
       <head>
+        <link rel="preload" as="image" href="/eye.webp" type="image/webp" fetchPriority="high" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -120,8 +120,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col">
         <LoadingProvider>
-          <CustomCursor />
-          <GlobalEyeBackground />
+          <AppChrome />
           <Suspense fallback={null}>
             <ScrollReveal />
           </Suspense>

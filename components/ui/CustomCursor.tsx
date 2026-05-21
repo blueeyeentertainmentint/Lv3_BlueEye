@@ -8,8 +8,14 @@ export default function CustomCursor() {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [type, setType] = useState("default");
   const [isVisible, setIsVisible] = useState(false);
+  const [pointerFine, setPointerFine] = useState(false);
 
   useEffect(() => {
+    setPointerFine(window.matchMedia("(pointer: fine)").matches);
+  }, []);
+
+  useEffect(() => {
+    if (!pointerFine) return;
     // Show cursor immediately if loading
     if (isLoading && !isVisible) {
       setIsVisible(true);
@@ -59,9 +65,9 @@ export default function CustomCursor() {
       window.removeEventListener("mouseover", handleMouseOver);
       window.removeEventListener("touchmove", handleTouchMove);
     };
-  }, [isVisible, isLoading, position.x, position.y]);
+  }, [isVisible, isLoading, position.x, position.y, pointerFine]);
 
-  if (!isVisible) return null;
+  if (!pointerFine || !isVisible) return null;
 
   return (
     <div 
