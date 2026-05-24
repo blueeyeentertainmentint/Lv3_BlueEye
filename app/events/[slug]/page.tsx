@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { getEventBySlug } from "@/lib/services/eventService";
-import { getRegistrationCountByEvent } from "@/lib/services/eventRegistrationService";
+import {
+  getRegistrationCountByEvent,
+  getRegistrationForUser,
+} from "@/lib/services/eventRegistrationService";
 import { notFound } from "next/navigation";
 import EventHero from "@/components/events/EventHero";
 import EventTimeline from "@/components/events/EventTimeline";
@@ -52,6 +55,14 @@ export default async function EventDetailPage({
   const registrationClosed =
     !event.registrationOpen ||
     ["Completed", "Cancelled"].includes(event.status);
+
+  const userRegistration =
+    session?.user?.email
+      ? await getRegistrationForUser(event._id, {
+          userId: (session.user as { id?: string }).id,
+          email: session.user.email,
+        })
+      : null;
 
   return (
     <article style={{ paddingTop: "var(--hdr-h)" }}>
@@ -193,7 +204,12 @@ export default async function EventDetailPage({
               <h3 style={{ margin: "0 0 1.25rem", fontSize: "0.95rem", fontWeight: 800, color: "var(--text)" }}>
                 {registrationClosed ? "Registration Closed" : "Register / Request Booking"}
               </h3>
-              <EventRegistrationForm slug={event.slug} closed={registrationClosed} />
+              <EventRegistrationForm
+                slug={event.slug}
+                closed={registrationClosed}
+                initialRegistration={userRegistration}
+                registrationPrefetched={!!session?.user?.email}
+              />
             </div>
 
           </div>

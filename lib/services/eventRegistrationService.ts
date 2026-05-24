@@ -30,11 +30,19 @@ export async function registerForEvent(data: {
   }
 
   // Prevent duplicate registrations from same email
-  const duplicate = await EventRegistration.findOne({
+  const duplicateEmail = await EventRegistration.findOne({
     eventId: data.eventId,
     guestEmail: data.guestEmail.toLowerCase(),
   });
-  if (duplicate) throw new Error("You have already registered for this event");
+  if (duplicateEmail) throw new Error("You have already registered for this event");
+  // Prevent duplicate registrations from same logged-in user
+  if (data.userId) {
+    const duplicateUser = await EventRegistration.findOne({
+      eventId: data.eventId,
+      userId: data.userId,
+    });
+    if (duplicateUser) throw new Error("You have already registered for this event");
+  }
 
   const reg = await EventRegistration.create({
     ...data,
@@ -74,6 +82,24 @@ export async function getRegistrationsByEvent(eventId: string) {
 export async function getRegistrationCountByEvent(eventId: string) {
   await connectToDatabase();
   return EventRegistration.countDocuments({ eventId, status: { $in: ["Pending", "Approved"] } });
+}
+
+/** Returns the user's registration for an event, if any (by account or email). */
+export async function getRegistrationForUser(
+  eventId: string,
+  opts: { userId?: string; email?: string }
+) {
+  await connectToDatabase();
+  const email = opts.email?.trim().toLowerCase();
+  const or: Record<string, unknown>[] = [];
+  if (opts.userId && opts.userId !== "admin-static") {
+    or.push({ userId: opts.userId });
+  }
+  if (email) or.push({ guestEmail: email });
+  if (or.length === 0) return null;
+
+  const reg = await EventRegistration.findOne({ eventId, $or: or }).lean();
+  return reg ? JSON.parse(JSON.stringify(reg)) : null;
 }
 
 export async function updateRegistrationStatus(
